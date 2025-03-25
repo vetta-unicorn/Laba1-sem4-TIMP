@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BookV1.cpp" />
     <ClCompile Include="HelperClassRealize.cpp" />
     <ClCompile Include="PageV1.cpp" />
   </ItemGroup>
