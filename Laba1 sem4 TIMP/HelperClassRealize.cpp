@@ -1,13 +1,13 @@
-#include "MyClassH.h"
+#include "HelperClass.h"
 
 
-void MyClass::CreateFile(std::string fileName)
+void HelperClass::CreateFileH(std::string fileName)
 {
 	std::ofstream out;
 	out.open(fileName);
 	out.close();
 }
-void MyClass::WriteInFile(std::string fileName, const char* writeInfo[]) 
+void HelperClass::WriteInFile(std::string fileName, const char* writeInfo[])
 {
 	std::ofstream out;
 	int lenght = 0;
@@ -32,7 +32,7 @@ void MyClass::WriteInFile(std::string fileName, const char* writeInfo[])
 	out.close();
 }
 
-void MyClass::WriteByPosition(std::string fileName, const char* writeInfo[], int pos)
+void HelperClass::WriteByPosition(std::string fileName, const char* writeInfo[], int pos)
 {
 	std::ofstream out;
 	int lenght = 0;
@@ -61,11 +61,24 @@ void MyClass::WriteByPosition(std::string fileName, const char* writeInfo[], int
 	out.close();
 
 }
-
-int MyClass::ReturnSizeFile(std::string fileName)
+int HelperClass::ReturnSizeFile(std::string fileName)
 {
 	std::ifstream fs(fileName, std::ios::binary | std::ios::ate);
 	return fs.tellg() * 8;
+}
+size_t HelperClass::ReturnCountElements(std::string fileName, size_t elemSize)
+{
+	std::fstream file;
+	file.open(fileName, std::ios::in | std::ios::out | std::ios::binary);
+
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Неудалось открыть файл!");
+	}
+	file.seekg(0, std::ios::end);
+	totalElements = file.tellg() / elemSize;
+	file.seekg(0, std::ios::beg);
+	file.close();
 }
 //int main()
 //{
