@@ -15,10 +15,10 @@ struct Page
     int numberPage = 0;
 
     bool statusPage = false; // true - страница модифицирована, 
-                             //false - страница не модифицирована
+    //false - страница не модифицирована
     std::time_t timeModify = 0;
 
-     
+
     //Пояснение к битовой карте//
     //Каждой странице предшествует битовая карта(массив битов),
     //в которой каждый бит соответствует ячейке моделируемого
@@ -30,7 +30,7 @@ struct Page
     std::vector<T> elemArray;
     size_t elemArraySize = MAX_SIZE_ARRAY;
 
-
+    std::vector<T> bufferElem;
     /// <summary>
     /// Переопределение оператора "<<" для простоты записи уже 
     /// готовой структуры в файл
@@ -62,15 +62,32 @@ struct Page
         this->byteMap = AddByteMap(_byteMap);
         this->elemArray = AddElements(_elemArray);
     }
-    void AddElemInArray(std::vector<T> _elemArray)
+    Page(int _numberPage, bool _statusModify, const std::vector<T> _elemArray)
     {
-        if (elemArray != NULL)
+        this->numberPage = _numberPage;
+        this->statusPage = _statusModify;
+        this->elemArray = AddElements(_elemArray);
+    }
+    void SetVectorSize()
+    {
+        byteMap.resize(byteMapSize);
+        elemArray.resize(elemArraySize);
+    }
+    void OverwritingBytemap()
+    {
+        for (typename std::vector<T>::iterator it1 = elemArray.begin(); it1 != elemArray.end(); ++it1)
         {
-            elemArray = _elemArray;
-        }
-        else
-        {
-            throw std::exception("");
+            for (std::vector<byte>::iterator it2 = byteMap.begin(); it2 != byteMap.end(); ++it2)
+            {
+                if (*it1 != NULL)
+                {
+                    *it2 = 1;
+                }
+                else 
+                {
+                    *it2 = 0;
+                }
+            }
         }
     }
     void AddByteMap(const std::vector<byte>& vec)
@@ -148,7 +165,7 @@ void TestStruct()
     std::time_t times = std::time(0);
 
 
-    const std::vector<byte> byteMap = { 1,0,0 };
+    const std::vector<byte> byteMap = {};
 
     const std::vector<char> elem = { 'a','b','c' };
     
