@@ -78,16 +78,47 @@ struct Page
     }
     void OverwritingBytemap()
     {
+        byteMap.clear();
         for (typename std::vector<T>::iterator it1 = elemArray.begin(); it1 != elemArray.end(); ++it1)
         {
-            if (*it1 != NULL)
+            if constexpr (std::is_same_v<T, int>)
             {
-                byteMap.push_back(1);
+                if (*it1 != 0)
+                {
+                    byteMap.push_back(1);
+                }
+                else
+                {
+                    byteMap.push_back(0);
+                }
+            }
+            else if constexpr (std::is_same_v<T, std::string>)
+            {
+                if (*it1 != "")
+                {
+                    byteMap.push_back(1);
+                }
+                else
+                {
+                    byteMap.push_back(0);
+                }
+            }
+            else if constexpr (std::is_same_v<T, char>)
+            {
+                if (*it1 != '\0')
+                {
+                    byteMap.push_back(1);
+                }
+                else
+                {
+                    byteMap.push_back(0);
+                }
             }
             else
             {
-                byteMap.push_back(0);
+                static_assert(std::is_same_v<T, int> || std::is_same_v<T, std::string> || std::is_same_v<T, char>, "Unsupported type for OverwritingBytemap");
             }
+            
         }
     }
     void AddByteMap(const std::vector<byte>& vec)
@@ -114,7 +145,7 @@ struct Page
         }
         std::cout << std::endl;
     }
-    size_t getTotalSize() noexcept
+    size_t getTotalSize()
     {
         size_t totalSizeByteMap = 0;
         size_t totalSizeElemArray = 0;
@@ -230,11 +261,86 @@ void TestStruct2()
     std::cout << "Массив elemArray:";
     page.PrintElemArray();
 }
+void TestStruct3()
+{
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
 
+
+    const std::time_t times = std::time(0);
+
+    const std::vector<std::string> elem(10, "sdoiaytbhlkiswdfhgbikuhjnoedlfkituhlnskfbyhltbgl,bsajynfdughnidlsfktyhnbsakujytrknansjbynvhvcmm186hvc872cv47193tv8uo6yq4v87921sjhkgbhvghnkjfhnsgubsf");
+
+    Page<std::string> page(1, true, elem);
+
+    page.timeModify = times;
+
+
+    // Запись в файл
+    std::ofstream file("adada.txt", std::ios::out);
+    if (file.is_open())
+    {
+        file << page;
+        file.close();
+    }
+    else
+    {
+        std::cout << "Не удалось открыть файл\n";
+    }
+
+    std::cout << page.getTotalSize() << " (размер страницы в байтах)" << std::endl;
+    std::cout << "Номер страницы: " << page.numberPage << std::endl;
+    std::cout << "Статус: " << (page.statusPage ? "true" : "false") << std::endl;
+    std::cout << "Время создания/изменения: " << page.getFormattedTime() << std::endl;
+    std::cout << "Массив byteMap:";
+    page.PrintByteMap();
+    std::cout << "Массив elemArray:";
+    page.PrintElemArray();
+}
+void TestStruct4()
+{
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+
+    const std::time_t times = std::time(0);
+
+    const std::vector<int> elem(100000, 12);
+
+    Page<int> page(1, true, elem);
+
+    page.timeModify = times;
+
+
+    // Запись в файл
+    std::ofstream file("adada.txt", std::ios::out);
+    if (file.is_open())
+    {
+        file << page;
+        file.close();
+    }
+    else
+    {
+        std::cout << "Не удалось открыть файл\n";
+    }
+
+    std::cout << page.getTotalSize() << " (размер страницы в байтах)" << std::endl;
+    std::cout << "Номер страницы: " << page.numberPage << std::endl;
+    std::cout << "Статус: " << (page.statusPage ? "true" : "false") << std::endl;
+    std::cout << "Время создания/изменения: " << page.getFormattedTime() << std::endl;
+    std::cout << "Массив byteMap:";
+    page.PrintByteMap();
+    std::cout << "Массив elemArray:";
+    page.PrintElemArray();
+}
 int main()
 {
-    TestStruct1();
+    //TestStruct1();
     std::cout << "---------------------------------" << std::endl;
-    TestStruct2();
+    //TestStruct2();
+    std::cout << "---------------------------------" << std::endl;
+    //TestStruct3();
+    std::cout << "---------------------------------" << std::endl;
+    TestStruct4();
     return 0; 
 }
