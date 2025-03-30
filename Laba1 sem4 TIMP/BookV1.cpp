@@ -1,5 +1,6 @@
 #include "PageV1.cpp"
 #include <unordered_map>
+
 template <typename T>
 class BookV1
 {
@@ -33,7 +34,7 @@ public:
 	{
 		if (!(sizeof(page) % 512))
 		{
-
+			book [page.numberPage + 1] = page;
 		}
 		else {}
 	}

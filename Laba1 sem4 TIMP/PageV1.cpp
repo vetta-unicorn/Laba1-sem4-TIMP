@@ -7,6 +7,8 @@
 
 #define MAX_SIZE_ARRAY 128
 
+#pragma warning(disable : 4996)
+
 template <typename T>
 struct Page
 {
@@ -59,14 +61,15 @@ struct Page
     {
         this->numberPage = _numberPage;
         this->statusPage = _statusModify;
-        this->byteMap = AddByteMap(_byteMap);
-        this->elemArray = AddElements(_elemArray);
+        AddByteMap(_byteMap);
+        AddElements(_elemArray);
     }
     Page(int _numberPage, bool _statusModify, const std::vector<T> _elemArray)
     {
         this->numberPage = _numberPage;
         this->statusPage = _statusModify;
-        this->elemArray = AddElements(_elemArray);
+        AddElements(_elemArray);
+        OverwritingBytemap();
     }
     void SetVectorSize()
     {
@@ -77,16 +80,13 @@ struct Page
     {
         for (typename std::vector<T>::iterator it1 = elemArray.begin(); it1 != elemArray.end(); ++it1)
         {
-            for (std::vector<byte>::iterator it2 = byteMap.begin(); it2 != byteMap.end(); ++it2)
+            if (*it1 != NULL)
             {
-                if (*it1 != NULL)
-                {
-                    *it2 = 1;
-                }
-                else 
-                {
-                    *it2 = 0;
-                }
+                byteMap.push_back(1);
+            }
+            else
+            {
+                byteMap.push_back(0);
             }
         }
     }
@@ -114,15 +114,15 @@ struct Page
         }
         std::cout << std::endl;
     }
-    size_t getTotalSize()
+    size_t getTotalSize() noexcept
     {
         size_t totalSizeByteMap = 0;
         size_t totalSizeElemArray = 0;
         
         for (int i = 0; i < MAX_SIZE_ARRAY; i++)
         {
-            totalSizeByteMap += sizeof(byteMap);
-            totalSizeElemArray += sizeof(elemArray);
+            totalSizeByteMap += sizeof(byteMap[i]);
+            totalSizeElemArray += sizeof(elemArray[i]);
         }
 
         return sizeof(Page<T>) + totalSizeByteMap + totalSizeElemArray;
@@ -155,20 +155,19 @@ struct Page
     }
 };
 
-
-void TestStruct()
+void TestStruct1()
 {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
-    Page<char> page(1, false);
-    std::time_t times = std::time(0);
+    Page<char> page(1, true);
+    const std::time_t times = std::time(0);
 
 
-    const std::vector<byte> byteMap = {};
+    const std::vector<byte> byteMap(127,1);
 
-    const std::vector<char> elem = { 'a','b','c' };
-    
+    const std::vector<char> elem(127, 'a');
+
     page.timeModify = times;
 
     page.AddByteMap(byteMap);
@@ -190,8 +189,52 @@ void TestStruct()
     std::cout << "Номер страницы: " << page.numberPage << std::endl;
     std::cout << "Статус: " << (page.statusPage ? "true" : "false") << std::endl;
     std::cout << "Время создания/изменения: " << page.getFormattedTime() << std::endl;
-    std::cout << "Массив byteMap: ";
+    std::cout << "Массив byteMap:";
     page.PrintByteMap();
+    std::cout << "Массив elemArray:";
     page.PrintElemArray();
-    std::cout << std::endl;
+}
+void TestStruct2()
+{
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+    
+    const std::time_t times = std::time(0);
+
+    const std::vector<char> elem = { 'a','b','c' };
+
+    Page<char> page(1, true, elem);
+
+    page.timeModify = times;
+
+
+    // Запись в файл
+    std::ofstream file("adada.txt", std::ios::out);
+    if (file.is_open())
+    {
+        file << page;
+        file.close();
+    }
+    else
+    {
+        std::cout << "Не удалось открыть файл\n";
+    }
+
+    std::cout << page.getTotalSize() << " (размер страницы в байтах)" << std::endl;
+    std::cout << "Номер страницы: " << page.numberPage << std::endl;
+    std::cout << "Статус: " << (page.statusPage ? "true" : "false") << std::endl;
+    std::cout << "Время создания/изменения: " << page.getFormattedTime() << std::endl;
+    std::cout << "Массив byteMap:";
+    page.PrintByteMap();
+    std::cout << "Массив elemArray:";
+    page.PrintElemArray();
+}
+
+int main()
+{
+    TestStruct1();
+    std::cout << "---------------------------------" << std::endl;
+    TestStruct2();
+    return 0; 
 }
