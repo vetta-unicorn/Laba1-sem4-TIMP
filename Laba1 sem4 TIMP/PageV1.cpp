@@ -17,7 +17,7 @@ struct Page
     int numberPage = 0;
 
     bool statusPage = false; // true - страница модифицирована, 
-    //false - страница не модифицирована
+                             // false - страница не модифицирована
     std::time_t timeModify = 0;
 
 
@@ -26,11 +26,11 @@ struct Page
     //в которой каждый бит соответствует ячейке моделируемого
     //массива, находящейся на странице. Значение бита 0 означает, что в эту ячейку ничего незаписано
     std::vector<byte> byteMap;
-    size_t byteMapSize = MAX_SIZE_ARRAY;
+    const size_t byteMapSize = MAX_SIZE_ARRAY;
 
     //Массив элементов
     std::vector<T> elemArray;
-    size_t elemArraySize = MAX_SIZE_ARRAY;
+    const size_t elemArraySize = MAX_SIZE_ARRAY;
 
     std::vector<T> bufferElem;
     /// <summary>
@@ -145,18 +145,26 @@ struct Page
         }
         std::cout << std::endl;
     }
-    size_t getTotalSize()
+    size_t getTotalSize() const
     {
-        size_t totalSizeByteMap = 0;
+        size_t baseSize = sizeof(Page<T>);
+
+        size_t totalSizeByteMap = byteMap.size() * sizeof(byte);
+
         size_t totalSizeElemArray = 0;
-        
-        for (int i = 0; i < MAX_SIZE_ARRAY; i++)
+        if constexpr (std::is_same_v<T, std::string>)
         {
-            totalSizeByteMap += sizeof(byteMap[i]);
-            totalSizeElemArray += sizeof(elemArray[i]);
+            for (const auto& str : elemArray)
+            {
+                totalSizeElemArray += sizeof(std::string) + str.size() * sizeof(char);
+            }
+        }
+        else
+        {
+            totalSizeElemArray = elemArray.size() * sizeof(T);
         }
 
-        return sizeof(Page<T>) + totalSizeByteMap + totalSizeElemArray;
+        return baseSize + totalSizeByteMap + totalSizeElemArray;
     }
 
     /// <summary>
@@ -177,16 +185,9 @@ struct Page
         std::strftime(buffer, sizeof(buffer), "%d.%m.%y %H:%M:%S", localTime);
         return std::string(buffer);
     }
-    void printVector(const std::vector<T>& vec)
-    {
-        for (auto it = vec.cbegin(); it != vec.cend(); ++it)
-        {
-            std::cout << *it;
-        }
-    }
 };
 
-void TestStruct1()
+static void TestStruct1()
 {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
@@ -225,7 +226,7 @@ void TestStruct1()
     std::cout << "Массив elemArray:";
     page.PrintElemArray();
 }
-void TestStruct2()
+static void TestStruct2()
 {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
@@ -261,7 +262,7 @@ void TestStruct2()
     std::cout << "Массив elemArray:";
     page.PrintElemArray();
 }
-void TestStruct3()
+static void TestStruct3()
 {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
@@ -269,7 +270,7 @@ void TestStruct3()
 
     const std::time_t times = std::time(0);
 
-    const std::vector<std::string> elem(10, "sdoiaytbhlkiswdfhgbikuhjnoedlfkituhlnskfbyhltbgl,bsajynfdughnidlsfktyhnbsakujytrknansjbynvhvcmm186hvc872cv47193tv8uo6yq4v87921sjhkgbhvghnkjfhnsgubsf");
+    const std::vector<std::string> elem(1, "sdoi");
 
     Page<std::string> page(1, true, elem);
 
@@ -292,12 +293,13 @@ void TestStruct3()
     std::cout << "Номер страницы: " << page.numberPage << std::endl;
     std::cout << "Статус: " << (page.statusPage ? "true" : "false") << std::endl;
     std::cout << "Время создания/изменения: " << page.getFormattedTime() << std::endl;
+
     std::cout << "Массив byteMap:";
     page.PrintByteMap();
     std::cout << "Массив elemArray:";
     page.PrintElemArray();
 }
-void TestStruct4()
+static void TestStruct4()
 {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
@@ -339,8 +341,8 @@ int main()
     std::cout << "---------------------------------" << std::endl;
     //TestStruct2();
     std::cout << "---------------------------------" << std::endl;
-    //TestStruct3();
+    TestStruct3();
     std::cout << "---------------------------------" << std::endl;
-    TestStruct4();
+    //TestStruct4();
     return 0; 
 }

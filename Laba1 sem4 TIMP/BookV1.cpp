@@ -6,6 +6,7 @@
 //{
 //private:
 //	std::unordered_map<size_t, Page<T>> book;
+//	Page bufferPage;
 //public:
 //	void CreateBookFile(std::string fileName)
 //	{
