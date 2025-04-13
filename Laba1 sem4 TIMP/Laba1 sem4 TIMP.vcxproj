@@ -21,7 +21,9 @@
   <ItemGroup>
     <ClCompile Include="BookV1.cpp" />
     <ClCompile Include="HelperClassRealize.cpp" />
-    <ClCompile Include="PageV1.cpp" />
+    <ClCompile Include="MainPageV1_1.cpp" />
+    <ClCompile Include="PageV1_1.h" />
+    <ClCompile Include="OldPageV1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HelperClass.h" />
