@@ -80,7 +80,7 @@ size_t HelperClass::ReturnCountElements(std::string fileName, size_t elemSize)
 	file.seekg(0, std::ios::beg);
 	file.close();
 }
-//int main()
+//int main5()
 //{
 //	MyClass dada;
 //

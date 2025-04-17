@@ -13,30 +13,13 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Исходные файлы\Page">
-      <UniqueIdentifier>{58552c6a-3c0c-4628-b5db-98ea3dd0dcf1}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="HelperClassRealize.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="BookV1.cpp">
       <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="OldPageV1.cpp">
-      <Filter>Исходные файлы\Page</Filter>
     </ClCompile>
     <ClCompile Include="PageV1_1.h">
       <Filter>Файлы заголовков</Filter>
     </ClCompile>
-    <ClCompile Include="MainPageV1_1.cpp">
-      <Filter>Исходные файлы\Page</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="HelperClass.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
