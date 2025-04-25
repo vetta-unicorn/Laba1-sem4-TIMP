@@ -9,6 +9,9 @@
 #include <exception>
 #include <algorithm>
 
+#define MAX_SIZE_INT 72
+#define MAX_SIZE_CHAR 180
+
 #pragma warning(disable : 4996)
 
 	template <typename T>
@@ -16,9 +19,10 @@
 	{
 	private:
 	 
-		int numberPage = 1;
+		int numberPage = 0;
 		bool statusPage = false;
 		size_t lenElemArray = 0;
+		size_t maxLen = 0;
 
 		std::string timeModify;
 
@@ -26,13 +30,15 @@
 
 		std::vector<T> elemArray;
 
-		size_t bitMapSize, elemArraySize = 0;
+		size_t bitMapSize = 0, elemArraySize = 0;
 
 		friend std::ostream& operator << (std::ostream& out, const PageV1_1<T>& page)
 		{
+	
 			out << page.numberPage << ' ';
 			out << page.statusPage << ' ';
 			out << page.lenElemArray << ' ';
+			out << page.maxLen << ' ';
 			out << page.timeModify << ' ';
 			for (std::vector<bool>::const_iterator it = page.bitMap.cbegin(); it != page.bitMap.cend(); ++it)
 			{
@@ -43,6 +49,7 @@
 			{
 				out << *it;
 			}
+			out << ' ';
 			return out;
 		}
 		friend std::istream& operator >> (std::istream& in, PageV1_1<T>& page)
@@ -54,7 +61,7 @@
 				std::vector<std::string> elemStr;
 				std::vector<int> elemInt;
 
-				in >> page.numberPage >> page.statusPage >> page.lenElemArray;
+				in >> page.numberPage >> page.statusPage >> page.lenElemArray >> page.maxLen;
 
 				std::string date, time;
 				in >> date >> time;
@@ -88,6 +95,7 @@
 
 				if constexpr (std::is_same_v<T, char>)
 				{
+					page.lenElemArray = 1;
 					for (char c : elemArrayStr)
 					{
 						page.elemArray.push_back(c);
@@ -130,6 +138,8 @@
 		}
 	
 
+
+		
 	public:
 
 		PageV1_1(int _numberPage, bool _statusPage)
@@ -137,7 +147,30 @@
 			this->numberPage = _numberPage;
 			this->statusPage = _statusPage;
 		}
-
+		PageV1_1()
+		{
+			this->numberPage = 0;
+			this->statusPage = false;
+			this->lenElemArray = 0;
+			if constexpr(std::is_same_v<T, int>)
+			{
+				this->elemArray = std::vector<int>(elemArraySize, 0);
+			}
+			else if constexpr (std::is_same_v<T, char>)
+			{
+				this->elemArray = std::vector<char>(elemArraySize, '0');
+			}
+			else if constexpr (std::is_same_v<T, std::string>)
+			{
+				this->elemArray = std::vector<std::string>(elemArraySize, "0");
+			}
+			else 
+			{
+				static_assert(std::is_same_v<T,int> || std::is_same_v<T, char> || std::is_same_v<T, std::string>,"Неподдерживаемый тип структуры");
+			}
+			SetBitMap();
+		}
+		
 	// Setters
 	void SetTimeModify(std::time_t time)
 	{
@@ -228,7 +261,7 @@
 	{
 		this->lenElemArray = lenSize;
 	}
-
+	void SetElemArraySize(size_t size) { this->elemArraySize = size; }
 	// Getters
 	std::string GetTimeModify()
 	{
@@ -263,6 +296,42 @@
 	}
 	int GetLenString() { return lenElemArray; }
 
+
+	std::vector<std::string> EraseString(const std::vector<std::string>& strArray, size_t maxLen)
+	{
+		std::vector<std::string> result;
+		for (auto& str : strArray)
+		{
+			for (size_t i = 0; i < str.length(); i += maxLen)
+			{
+				result.push_back(str.substr(i, maxLen));
+			}
+		}
+		return result;
+	}
+
+	void PrintPage()
+	{
+		std::cout << GetTotalSize() << " (размер страницы в битах)" << std::endl;
+		std::cout << "Номер страницы: " << GetNumberPage() << std::endl;
+		std::cout << "Статус: " << (GetStatusPage() ? "true" : "false") << std::endl;
+		std::cout << "Время создания/изменения: " << GetTimeModify() << std::endl;
+		std::cout << "Длина одного элемента из elemArray: " << GetLenString() << std::endl;
+		std::cout << "Массив bitMap:";
+		for (const auto& item : bitMap)
+		{
+			std::cout << item;
+		}
+		std::cout << std::endl;
+		std::cout << "    " << bitMap.size() << std::endl;
+		std::cout << "Массив elemArray:";
+		for (const auto& item : elemArray)
+		{
+			std::cout << item;
+		}
+		std::cout << std::endl;
+		std::cout << "    " << elemArray.size() << '\n';
+	}
 	~PageV1_1()
 	{
 		bitMap.clear();
@@ -270,102 +339,3 @@
 	}
 };
 
-// Тесты сериализации и десериализации
-int TestPageV1_1()
-{
-
-
-
-	std::time_t times = std::time(0);
-
-	std::vector<std::string> elem(100, "123");
-	std::vector<int> elem1(200, 12);
-	std::vector<char> elem2(200, 'a');
-	std::vector<char> elem3{ 'a','b','c' };
-	PageV1_1<std::string> page(1, false);
-	//PageV1_1<int> page(1,false);
-	//PageV1_1<char> page(1, false);
-	page.SetTimeModify(times);
-
-	page.SetElemArray(elem);
-	//page.SetElemArray(elem1);
-	//page.SetElemArray(elem2);
-	//page.SetElemArray(elem3);
-	page.SetBitMap();
-	page.SetLenString(3);
-	auto _elemArray = page.GetElemArray();
-	auto _bitMap = page.GetBitMap();
-
-	// Запись в файл
-	std::ofstream file("abibasss.txt", std::ios::out || std::ios::in);
-	if (file.is_open())
-	{
-		file << page;
-	}
-	else
-	{
-		file.open("abibadadas.txt");
-		file << page;
-	}
-	std::cout << "Запись в файл .txt" << std::endl;
-	std::cout << page.GetTotalSize() << " (размер страницы в байтах)" << std::endl;
-	std::cout << "Номер страницы: " << page.GetNumberPage() << std::endl;
-	std::cout << "Статус: " << (page.GetStatusPage() ? "true" : "false") << std::endl;
-	std::cout << "Время создания/изменения: " << page.GetTimeModify() << std::endl;
-	std::cout << "Размер одного элемента elemArray: " << page.GetLenString() << std::endl;
-	std::cout << "Массив bitMap:";
-	for (const auto& item : _bitMap)
-	{
-		std::cout << item;
-	}
-	std::cout << "    " << _bitMap.size() << std::endl;
-	std::cout << "Массив elemArray:";
-	for (const auto& item : _elemArray)
-	{
-		std::cout << item;
-	}
-	std::cout << "    " << _elemArray.size() << '\n';
-
-	file.close();
-	return 0;
-}
-int TestPageV1_1_1()
-{
-
-	PageV1_1<std::string> page(1, false);
-
-
-	std::ifstream readInfo("abibadadas.txt");
-
-	if (!readInfo.is_open())
-	{
-		std::cerr << "Can't open file" << std::endl;
-	}
-	readInfo >> page;
-	auto _bitMap = page.GetBitMap();
-	auto _elemArray = page.GetElemArray();
-	//page.SetLenString(1);
-	std::cout << "Чтение из файла" << std::endl;
-	std::cout << page.GetTotalSize() << " (размер страницы в байтах)" << std::endl;
-	std::cout << "Номер страницы: " << page.GetNumberPage() << std::endl;
-	std::cout << "Статус: " << (page.GetStatusPage() ? "true" : "false") << std::endl;
-	std::cout << "Время создания/изменения: " << page.GetTimeModify() << std::endl;
-	std::cout << "Длина одного элемента из elemArray: " << page.GetLenString() << std::endl;
-	std::cout << "Массив bitMap:";
-	for (const auto& item : _bitMap)
-	{
-		std::cout << item;
-	}
-	//std::cout << std::endl;
-	std::cout << "    " << _bitMap.size() << std::endl;
-	std::cout << "Массив elemArray:";
-	for (const auto& item : _elemArray)
-	{
-		std::cout << item;
-	}
-	//std::cout << std::endl;
-	std::cout << "    " << _elemArray.size() << '\n';
-
-	readInfo.close();
-	return 0;
-}
