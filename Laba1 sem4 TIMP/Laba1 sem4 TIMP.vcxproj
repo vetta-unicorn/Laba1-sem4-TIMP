@@ -23,6 +23,7 @@
     <ClCompile Include="Chernovik.cpp" />
     <ClCompile Include="PageV1_1.h" />
     <ClCompile Include="UserInterface.cpp" />
+    <ClCompile Include="VirtualMemory.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
