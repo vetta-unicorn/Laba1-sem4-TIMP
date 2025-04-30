@@ -1,138 +1,5 @@
-#include "PageV1_1.h"
-#include <unordered_map>
-#include <windows.h>
-#include <variant>
-
-enum class Types {T_INT, T_VARCHAR, T_CHAR};
-using enum Types;
-
-template <typename T>
-class BookV1
-{
-private:
-	std::unordered_map<size_t, PageV1_1<T>> book;
-	PageV1_1<T> bufferPage;
-
-	size_t lenString;
-	std::string fileName;
-	long long ArraySize;
-	Types type_page;
-
-
-	size_t globalSize;
-	T& GetElementByGlobalIndex(std::unordered_map<size_t, PageV1_1<T>> pages, size_t globalIndex)
-	{
-		size_t currentIndex = 0;
-		for (auto& pair : pages)
-		{
-			std::vector<T>& vector = pair.second.GetElemArray();
-			size_t vectorSize = vector.size();
-			if (globalIndex >= currentIndex && globalIndex < currentIndex + vectorSize)
-			{
-				size_t localIndex = globalIndex - currentIndex;
-				return vector[localIndex];
-			}
-			currentIndex += vectorSize;
-		}
-		std::out_of_range("Global index out of range");
-	}
-public:
-	BookV1(std::string _fileName, size_t _lenString, long long _ArraySize)
-	{
-		this->fileName = _fileName;
-		this->lenString = _lenString;
-		this->ArraySize = _ArraySize;
-	}
-	void Create(const std::string& _fileName, const std::string& type)
-	{
-		std::ofstream createPage(_fileName, std::ios::out | std::ios::in);
-		PageV1_1<T> page;
-
-		if (type == "INT")
-		{
-			type_page = T_INT;
-		}
-		else if (type == "VARCHAR")
-		{
-			type_page = T_VARCHAR;
-		}
-		else if (type == "CHAR")
-		{
-			type_page = T_CHAR;
-		}
-		else
-		{
-			throw std::invalid_argument("Неподдерживаемый тип: " + type);
-		}
-		if ((createPage.is_open()) && 
-			(type_page == T_INT && std::is_same_v<T, int>) ||
-			(type_page == T_CHAR && std::is_same_v<T, char>) ||
-			(type_page == T_VARCHAR && std::is_same_v<T, std::string>))
-		{
-			createPage << page;
-		}
-		else
-		{
-			createPage.open(_fileName);
-			createPage << page;
-		}
-		createPage.close();
-
-	}
-	void ReadPages(const std::string& _fileName)
-	{
-		std::fstream file(_fileName);
-	}
-	
-	void Print(size_t index, T& elem)
-	{
-		
-	}
-	void Input()
-	{
-
-	}
-	void Exit()
-	{
-	}
-
-
-	size_t GetGlobalSize()
-	{
-		size_t totalSize = 0;
-		for (const auto& pair : book)
-		{
-			totalSize += pair.second.size();
-		}
-		return totalSize;
-	}
-	PageV1_1<T> GetPage()
-	{
-		return bufferPage;
-	}
-	void SetPage(PageV1_1<T> page)
-	{
-		this->bufferPage = page.GetNumberPage();
-		this->bufferPage = page.GetStatusPage();
-		this->bufferPage = page.GetLenString();
-		this->bufferPage = page.GetBitMap();
-		this->bufferPage = page.GetElemArray();
-	}
-};
-int TestBookV1()
-{
-
-	std::string fileName = "dada.txt";
-	size_t lenString = 1;
-	std::string typeINT = "INT", typeWCHAR = "VARCHAR", typeCHAR = "CHAR";
-	long long ArraySize = 123;
-	BookV1<int> book(fileName, lenString, ArraySize);
-	book.Create(fileName, typeCHAR);
-	PageV1_1<int> page; // = book.GetPage();
-	page.SetElemArraySize(100);
-	page.PrintPage();
-	return 0;
-}
+#include "PageV1_1.hpp"
+//Tests for PageV1_1
 // Тесты сериализации и десериализации
 void TestPageV1_1()
 {
@@ -187,7 +54,7 @@ void TestPageV1_1()
 	std::cout << "    " << _elemArray.size() << '\n';
 
 	std::string str = _elemArray[0];
-	std::cout << str.size() * sizeof(char)<< "+40" << std::endl;
+	std::cout << str.size() * sizeof(char) << "+40" << std::endl;
 
 	file.close();
 }
@@ -240,7 +107,7 @@ void TestPageV1_1_2()
 	std::vector<int> elemInt(10, 45);
 	std::vector<char> elemChar(10, 'c');
 	std::vector<std::string> elemStr(10, "sdhgfkshsggfjsaivjrheyygukhffouuskhjkfstgvyjdhfjhfuisghfjklfaeyisghkjfhjldaisghjfkashg");
-	
+
 	PageV1_1<int> pageInt;
 	PageV1_1<char> pageChar;
 	PageV1_1<std::string> pageStr;
@@ -366,12 +233,3 @@ void TestPageV1_1_4()
 	}
 	std::cout << std::endl << newElem.size() << std::endl;
 }
-//int main()
-//{
-//	SetConsoleCP(1251);
-//	SetConsoleOutputCP(1251);
-//	//TestPageV1_1();
-//	TestPageV1_1_1();
-//	//TestPageV1_1_4();
-//	return 0;
-//}

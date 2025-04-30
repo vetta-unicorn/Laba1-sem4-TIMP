@@ -2,23 +2,19 @@
 
 #include <vector>
 #include <string>
-#include <string_view>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <exception>
-#include <algorithm>
-//#include <windows.h>
 
 #define MAX_SIZE_INT 72
 #define MAX_SIZE_CHAR 180
 #define MAX_MEMORY_SIZE 512
-//C++20 is required for compilation
 
+
+//C++17 is required for compilation
 
 #pragma warning(disable : 4996)
-
-
 
 	template <typename T>
 	struct PageV1_1
@@ -477,19 +473,19 @@
 	}
 	void PrintPage()
 	{
-		std::cout << GetTotalSize() << " (размер страницы в битах)" << std::endl;
-		std::cout << "Номер страницы: " << GetNumberPage() << std::endl;
-		std::cout << "Статус: " << (GetStatusPage() ? "true" : "false") << std::endl;
-		std::cout << "Время создания/изменения: " << GetTimeModify() << std::endl;
-		std::cout << "Длина одного элемента из elemArray: " << GetLenString() << std::endl;
-		std::cout << "Массив bitMap:";
+		std::cout << GetTotalSize() << " (size page in bytes)" << std::endl;
+		std::cout << "Number Page: " << GetNumberPage() << std::endl;
+		std::cout << "Status: " << (GetStatusPage() ? "true" : "false") << std::endl;
+		std::cout << "Time create/modify: " << GetTimeModify() << std::endl;
+		std::cout << "Len one elements from elemArray" << GetLenString() << std::endl;
+		std::cout << "Array bitMap:";
 		for (const auto& item : bitMap)
 		{
 			std::cout << item;
 		}
 		std::cout << std::endl;
 		std::cout << "    " << bitMap.size() << std::endl;
-		std::cout << "Массив elemArray:";
+		std::cout << "Array elemArray:";
 		for (const auto& item : elemArray)
 		{
 			std::cout << item;
@@ -503,4 +499,3 @@
 		elemArray.clear();
 	}
 };
-

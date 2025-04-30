@@ -19,11 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BookV1.cpp" />
     <ClCompile Include="Chernovik.cpp" />
-    <ClCompile Include="PageV1_1.h" />
+    <ClCompile Include="PageV1_1.hpp" />
+    <ClCompile Include="TestMain.cpp" />
+    <ClCompile Include="TestPageV1_1.cpp" />
+    <ClCompile Include="TestVM.cpp" />
     <ClCompile Include="UserInterface.cpp" />
-    <ClCompile Include="VirtualMemory.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="VirtualMemory.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
