@@ -142,19 +142,19 @@
 		
 	public:
 
-		PageV1_1() : numberPage(0), statusPage(false), lenElemArray(1), timeModify("00:00:00 00.00.00")
+		PageV1_1() : numberPage(0), statusPage(false), lenElemArray(1), timeModify("00:00:00 00.00.00"), elemArraySize_t(1)
 		{
 			if constexpr(std::is_same_v<T, int>)
 			{
-				this->elemArray = std::vector<int>(1, 0);
+				this->elemArray = std::vector<int>(elemArraySize_t, 1);
 			}
 			else if constexpr (std::is_same_v<T, char>)
 			{
-				this->elemArray = std::vector<char>(1, '0');
+				this->elemArray = std::vector<char>(elemArraySize_t, '0');
 			}
 			else if constexpr (std::is_same_v<T, std::string>)
 			{
-				this->elemArray = std::vector<std::string>(1, "0");
+				this->elemArray = std::vector<std::string>(elemArraySize_t, "0");
 			}
 			else 
 			{
@@ -254,6 +254,7 @@
 		this->lenElemArray = lenSize;
 	}
 	void SetElemArraySize(size_t size) { this->elemArraySize_t = size; }
+	void SetStatusPage(bool status) { this->statusPage = status; }
 	// Getters
 	std::string GetTimeModify()
 	{

@@ -18,13 +18,14 @@ int main()
 		size_t typePage;
 		std::cout << "Enter choice: ";
 		std::cin >> choice;
+		std::cout << std::endl;
 		try
 		{
 			switch (choice)
 			{
 			case 1:
 				std::cout << "Enter file name: ";
-				std::cin >> fileName;
+				std::cin >> fileName ;
 
 				std::cout << "List of types" << std::endl;
 				std::cout << "1. INT" << std::endl;
@@ -80,6 +81,31 @@ int main()
 
 
 			case 2:
+			{
+				size_t index;
+				std::string value;
+
+				int intResult;
+				char charResult;
+				std::cout << "Enter index: ";
+				std::cin >> index;
+
+				std::cout << "Enter value: ";
+				std::cin >> value;
+				if (us.stringToInt(value, intResult))
+				{
+					us.Input(index, intResult);
+				}
+				else if (us.stringToChar(value, charResult))
+				{
+					us.Input(index, charResult);
+				}
+				else
+				{
+					us.Input(index, value);
+				}
+			}
+			
 				break;
 			case 3:
 				break;

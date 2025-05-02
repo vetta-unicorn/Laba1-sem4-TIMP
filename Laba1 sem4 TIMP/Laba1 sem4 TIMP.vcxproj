@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClCompile Include="ControlHeaders.hpp" />
     <ClCompile Include="PageV1_1.hpp" />
-    <ClCompile Include="TestMain.cpp" />
     <ClCompile Include="TestPageV1_1.cpp" />
     <ClCompile Include="TestVM.cpp" />
     <ClCompile Include="UserCommands.hpp" />

@@ -18,7 +18,7 @@ public:
         std::memset(initMemory, 0, MAX_MEMORY_SIZE);
     }
     template <typename T>
-    bool write(size_t address, const T& data)
+    bool write(size_t address, const T data)
     {
         // Проверяем, достаточно ли места
         size_t data_size = data.GetTotalSize();
