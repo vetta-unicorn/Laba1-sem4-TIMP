@@ -8,7 +8,7 @@ enum class Types {T_INT, T_CHAR, T_VARCHAR};
 class UserCommands
 {
 private:
-	
+	std::vector<Types> types;
 	std::vector<VirtualMemory> stack;
 	size_t globalIndex;
 	template <typename T>
@@ -67,6 +67,7 @@ public:
 		{
 		case Types::T_CHAR:
 		{
+			types.push_back(Types::T_CHAR);
 			PageV1_1<char> page;
 			VirtualMemory vm;
 			file << page;
@@ -82,6 +83,7 @@ public:
 		}
 		case Types::T_INT:
 		{
+			types.push_back(Types::T_INT);
 			PageV1_1<int> page;
 			VirtualMemory vm;
 			file << page;
@@ -97,6 +99,7 @@ public:
 		}
 		case Types::T_VARCHAR:
 		{
+			types.push_back(Types::T_VARCHAR);
 			PageV1_1 <std::string> page;
 			VirtualMemory vm;
 			page.SetLenString(maxLenStr);
@@ -123,12 +126,10 @@ public:
 	template <typename T>
 	void Input(size_t index, const T value)
 	{
-		// Проверка пустого стека
 		if (stack.empty()) {
 			throw std::runtime_error("Stack is empty");
 		}
 
-		// Проверка корректности индекса
 		size_t totalElem = getGlobalIndex<T>(stack);
 		if (index >= totalElem) {
 			throw std::out_of_range("Index out of range: " + std::to_string(index) +
@@ -138,13 +139,11 @@ public:
 		size_t currentIndex = 0;
 		for (size_t i = 0; i < stack.size(); ++i) {
 			PageV1_1<T> page;
-			// Чтение страницы
 			if (!stack[i].read(0, page)) {
 				std::cerr << "Failed to read PageV1_1<T> at stack index: " << i << std::endl;
 				throw std::runtime_error("Failed to read page at stack index: " + std::to_string(i));
 			}
 
-			// Проверка размера страницы
 			auto elemArray = page.GetElemArray();
 			auto bitMap = page.GetBitMap();
 			size_t pageSize = elemArray.size();
@@ -164,13 +163,11 @@ public:
 						", page size: " + std::to_string(pageSize));
 				}
 
-				// Обновление данных страницы
 				elemArray[localIndex] = value;
 				bitMap[localIndex] = true;
 				page.SetStatusPage(true);
 				page.SetTimeModify(std::time(nullptr));
 
-				// Запись страницы
 				if (!stack[i].write(0, page)) {
 					throw std::runtime_error("Failed to write page back to stack at index: " +
 						std::to_string(i));
@@ -180,10 +177,111 @@ public:
 			currentIndex += pageSize;
 		}
 
-		// Если страница не найдена
 		throw std::runtime_error("Could not find page for index: " + std::to_string(index));
 	}
-	void Print(size_t index);
+	template <typename T>
+	void Print(size_t index, size_t stackIndex) {
+		if (stack.empty()) {
+			throw std::runtime_error("Stack is empty");
+		}
+		if (stackIndex >= stack.size()) {
+			throw std::out_of_range("Stack index out of range: " + std::to_string(stackIndex));
+		}
+		PageV1_1<T> page;
+		if (!stack[stackIndex].read(0, page)) {
+			std::cerr << "Failed to read PageV1_1<T> at stack index: " << stackIndex << std::endl;
+			throw std::runtime_error("Failed to read page at stack index: " + std::to_string(stackIndex));
+		}
+		auto elemArray = page.GetElemArray();
+		auto bitMap = page.GetBitMap();
+		size_t pageSize = elemArray.size();
+		if (pageSize != bitMap.size()) {
+			throw std::runtime_error("Inconsistent page size: elemArray size = " +
+				std::to_string(pageSize) + ", bitMap size = " +
+				std::to_string(bitMap.size()));
+		}
+		if (index >= pageSize) {
+			throw std::out_of_range("Index out of range: " + std::to_string(index) +
+				", page size: " + std::to_string(pageSize));
+		}
+		if (!bitMap[index]) {
+			throw std::runtime_error("Element at index " + std::to_string(index) +
+				" is not initialized");
+		}
+		std::cout << "Value at index " << index << ": " << elemArray[index] << "\n";
+	}
+
+	void Print(size_t index) {
+		if (stack.empty() || types.empty()) {
+			throw std::runtime_error("Stack or types is empty");
+		}
+		if (stack.size() != types.size()) {
+			throw std::runtime_error("Mismatch between stack and types sizes");
+		}
+
+		try {
+			size_t currentIndex = 0;
+			for (size_t i = 0; i < stack.size(); ++i) {
+				PageV1_1<int> pageInt;
+				PageV1_1<char> pageChar;
+				PageV1_1<std::string> pageString;
+				size_t pageSize = 0;
+
+				// Определяем тип страницы и читаем её
+				switch (types[i]) {
+				case Types::T_INT:
+					if (stack[i].read(0, pageInt)) {
+						pageSize = pageInt.GetElemArray().size();
+					}
+					else {
+						throw std::runtime_error("Failed to read page at stack index: " + std::to_string(i));
+					}
+					break;
+				case Types::T_CHAR:
+					if (stack[i].read(0, pageChar)) {
+						pageSize = pageChar.GetElemArray().size();
+					}
+					else {
+						throw std::runtime_error("Failed to read page at stack index: " + std::to_string(i));
+					}
+					break;
+				case Types::T_VARCHAR:
+					if (stack[i].read(0, pageString)) {
+						pageSize = pageString.GetElemArray().size();
+					}
+					else {
+						throw std::runtime_error("Failed to read page at stack index: " + std::to_string(i));
+					}
+					break;
+				default:
+					throw std::runtime_error("Unknown type for stack index: " + std::to_string(i));
+				}
+
+				// Проверяем, попадает ли индекс в текущую страницу
+				if (index < currentIndex + pageSize) {
+					size_t localIndex = index - currentIndex;
+					switch (types[i]) {
+					case Types::T_INT:
+						Print<int>(localIndex, i);
+						return;
+					case Types::T_CHAR:
+						Print<char>(localIndex, i);
+						return;
+					case Types::T_VARCHAR:
+						Print<std::string>(localIndex, i);
+						return;
+					default:
+						throw std::runtime_error("Unknown type");
+					}
+				}
+				currentIndex += pageSize;
+			}
+			throw std::out_of_range("Index out of range: " + std::to_string(index));
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Error: " << e.what() << "\n";
+		}
+	}
 	void Exit();
 
 	void PrintVMStack(Types type)

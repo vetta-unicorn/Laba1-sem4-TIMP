@@ -150,11 +150,11 @@
 			}
 			else if constexpr (std::is_same_v<T, char>)
 			{
-				this->elemArray = std::vector<char>(elemArraySize_t, '0');
+				this->elemArray = std::vector<char>(elemArraySize_t, '1');
 			}
 			else if constexpr (std::is_same_v<T, std::string>)
 			{
-				this->elemArray = std::vector<std::string>(elemArraySize_t, "0");
+				this->elemArray = std::vector<std::string>(elemArraySize_t, "1");
 			}
 			else 
 			{
@@ -471,22 +471,22 @@
 	}
 	void PrintPage()
 	{
-		std::cout << GetTotalSize() << " (size page in bytes)" << std::endl;
+		//std::cout << GetTotalSize() << " (size page in bytes)" << std::endl;
 		std::cout << "Number Page: " << GetNumberPage() << std::endl;
 		std::cout << "Status: " << (GetStatusPage() ? "true" : "false") << std::endl;
 		std::cout << "Time create/modify: " << GetTimeModify() << std::endl;
 		std::cout << "Len one elements from elemArray: " << GetLenString() << std::endl;
 		std::cout << "Array bitMap:";
-		for (const auto& item : bitMap)
+		for (std::vector<bool>::iterator it = bitMap.begin(); it != bitMap.end(); ++it)
 		{
-			std::cout << item;
+			std::cout << *it;
 		}
 		std::cout << std::endl;
 		std::cout << "    " << bitMap.size() << std::endl;
-		std::cout << "Array elemArray:";
-		for (const auto& item : elemArray)
+		std::cout << "Array elemArray: ";
+		for (typename std::vector<T>::iterator it = elemArray.begin(); it != elemArray.end(); ++it)
 		{
-			std::cout << item;
+			std::cout << *it;
 		}
 		std::cout << std::endl;
 		std::cout << "    " << elemArray.size() << '\n';

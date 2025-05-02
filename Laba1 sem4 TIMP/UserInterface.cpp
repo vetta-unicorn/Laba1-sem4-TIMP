@@ -108,6 +108,10 @@ int main()
 			
 				break;
 			case 3:
+				size_t index;
+				std::cout << "Enter index: ";
+				std::cin >> index;
+				us.Print(index);
 				break;
 			case 4:
 				work = false;
