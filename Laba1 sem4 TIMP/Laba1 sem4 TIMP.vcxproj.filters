@@ -21,9 +21,6 @@
     <ClCompile Include="UserInterface.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Chernovik.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="TestMain.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -32,6 +29,12 @@
     </ClCompile>
     <ClCompile Include="TestVM.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="UserCommands.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlHeaders.hpp">
+      <Filter>Файлы заголовков</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

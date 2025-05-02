@@ -4,7 +4,6 @@
 
 #define MAX_MEMORY_SIZE 512
 
-template <typename T>
 class VirtualMemory
 {
 private:
@@ -18,7 +17,7 @@ public:
         std::memset(memory, 0, MAX_MEMORY_SIZE);
         std::memset(initMemory, 0, MAX_MEMORY_SIZE);
     }
-
+    template <typename T>
     bool write(size_t address, const T& data)
     {
         // Проверяем, достаточно ли места
@@ -42,6 +41,7 @@ public:
         return true;
     }
 
+    template <typename T>
     bool read(size_t address, T& data) const
     {
         if (address >= MAX_MEMORY_SIZE) {
@@ -73,5 +73,4 @@ public:
 
     size_t getUsedSize() const { return used_size; }
     size_t getCapacity() const { return MAX_MEMORY_SIZE; }
-
 };

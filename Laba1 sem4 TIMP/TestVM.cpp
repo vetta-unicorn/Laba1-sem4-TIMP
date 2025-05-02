@@ -1,13 +1,13 @@
 #include "VirtualMemory.hpp"
 void TestVM_1()
 {
-    VirtualMemory<PageV1_1<int>> vm;
+    VirtualMemory vm;
 
     PageV1_1<int> page1;
 
 
 
-    vm.write(0, page1);
+    vm.write<PageV1_1<int>>(0, page1);
 
 
     PageV1_1<int> page2;
@@ -19,9 +19,9 @@ void TestVM_1()
 }
 void TestVM_2()
 {
-    VirtualMemory<PageV1_1<int>> vmInt;
-    VirtualMemory<PageV1_1<char>> vmChar;
-    VirtualMemory<PageV1_1<std::string>> vmString;
+    VirtualMemory vmInt;
+    VirtualMemory vmChar;
+    VirtualMemory vmString;
 
     std::time_t times = std::time(0);
 
@@ -48,9 +48,9 @@ void TestVM_2()
     pageStr.SetLenString(12);
     pageStr.SetBitMap();
 
-    vmInt.write(0, pageInt);
-    vmInt.write(sizeof(pageInt), pageInt);
-    vmChar.write(0, pageChar);
+    vmInt.write<PageV1_1<int>>(0, pageInt);
+    vmInt.write<PageV1_1<int>>(sizeof(pageInt), pageInt);
+    vmChar.write<PageV1_1<char>>(0, pageChar);
     //  vmString.write(0, pageStr);
 
     PageV1_1<std::string> page3;

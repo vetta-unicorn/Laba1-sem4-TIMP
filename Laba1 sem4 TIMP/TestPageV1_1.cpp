@@ -233,3 +233,12 @@ void TestPageV1_1_4()
 	}
 	std::cout << std::endl << newElem.size() << std::endl;
 }
+void TestPageV1_1_5()
+{
+	PageV1_1<std::string> page;
+
+	std::fstream file("asd.txt", std::ios::in | std::ios::out);
+
+	file << page;
+	page.PrintPage();
+}

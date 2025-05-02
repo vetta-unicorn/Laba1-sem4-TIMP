@@ -25,14 +25,14 @@
 		bool statusPage = false;
 
 		// Длина одного элемента в elemArray
-		size_t lenElemArray = 0;
+		size_t lenElemArray = 1;
 		
 		std::string timeModify;
 
 		std::vector<bool> bitMap;
 		std::vector<T> elemArray;
 
-		size_t elemArraySize_t = 0;
+		size_t elemArraySize_t = 1;
 
 		friend std::ostream& operator << (std::ostream& out, const PageV1_1<T>& page)
 		{
@@ -142,22 +142,19 @@
 		
 	public:
 
-		PageV1_1()
+		PageV1_1() : numberPage(0), statusPage(false), lenElemArray(1), timeModify("00:00:00 00.00.00")
 		{
-			this->numberPage = 0;
-			this->statusPage = false;
-			this->lenElemArray = 0;
 			if constexpr(std::is_same_v<T, int>)
 			{
-				this->elemArray = std::vector<int>(elemArraySize_t, 0);
+				this->elemArray = std::vector<int>(1, 0);
 			}
 			else if constexpr (std::is_same_v<T, char>)
 			{
-				this->elemArray = std::vector<char>(elemArraySize_t, '0');
+				this->elemArray = std::vector<char>(1, '0');
 			}
 			else if constexpr (std::is_same_v<T, std::string>)
 			{
-				this->elemArray = std::vector<std::string>(elemArraySize_t, "0");
+				this->elemArray = std::vector<std::string>(1, "0");
 			}
 			else 
 			{
@@ -477,7 +474,7 @@
 		std::cout << "Number Page: " << GetNumberPage() << std::endl;
 		std::cout << "Status: " << (GetStatusPage() ? "true" : "false") << std::endl;
 		std::cout << "Time create/modify: " << GetTimeModify() << std::endl;
-		std::cout << "Len one elements from elemArray" << GetLenString() << std::endl;
+		std::cout << "Len one elements from elemArray: " << GetLenString() << std::endl;
 		std::cout << "Array bitMap:";
 		for (const auto& item : bitMap)
 		{
